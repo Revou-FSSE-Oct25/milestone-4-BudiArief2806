@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AccountType {
+  SAVINGS
+  CHECKING
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  TRANSFER
+}
+
+enum TransactionStatus {
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id                   Int           @id @default(autoincrement())
+  fullName             String
+  email                String        @unique
+  passwordHash         String
+  phone                String?
+  role                 UserRole      @default(USER)
+  accounts             Account[]
+  performedTransactions Transaction[]
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Account {
+  id                   Int           @id @default(autoincrement())
+  userId               Int
+  accountNumber        String        @unique
+  accountName          String
+  accountType          AccountType
+  currency             String        @default("IDR")
+  balance              Decimal       @default(0) @db.Decimal(15, 2)
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  outgoingTransactions Transaction[] @relation("SourceAccountTransactions")
+  incomingTransactions Transaction[] @relation("DestinationAccountTransactions")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([accountType])
+  @@index([createdAt])
+}
+
+model Transaction {
+  id                   Int               @id @default(autoincrement())
+  reference            String            @unique
+  transactionType      TransactionType
+  status               TransactionStatus @default(COMPLETED)
+  amount               Decimal           @db.Decimal(15, 2)
+  description          String?
+  performedById        Int
+  sourceAccountId      Int?
+  destinationAccountId Int?
+  performedBy          User              @relation(fields: [performedById], references: [id], onDelete: Restrict)
+  sourceAccount        Account?          @relation("SourceAccountTransactions", fields: [sourceAccountId], references: [id], onDelete: Restrict)
+  destinationAccount   Account?          @relation("DestinationAccountTransactions", fields: [destinationAccountId], references: [id], onDelete: Restrict)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@index([performedById])
+  @@index([sourceAccountId])
+  @@index([destinationAccountId])
+  @@index([transactionType])
+  @@index([createdAt])
+}
