@@ -190,5 +190,6 @@ test/
 ```
 
 ## LINK RAILWAY : https://luminous-harmony-production-e4c4.up.railway.app/docs#/Auth/AuthController_login
+## Link tambahan : https://luminous-harmony-production-e4c4.up.railway.app/health
 
 - Project ini memakai Prisma 7, sehingga koneksi PostgreSQL menggunakan `@prisma/adapter-pg`.
