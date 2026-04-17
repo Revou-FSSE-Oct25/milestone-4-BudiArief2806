@@ -4,6 +4,8 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
 
+// TransactionsModule menangani seluruh alur transaksi saldo:
+// deposit, withdraw, transfer, dan riwayat transaksi.
 @Module({
   imports: [PrismaModule, AccountsModule],
   controllers: [TransactionsController],

@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { UsersModule } from './users/users.module';
 
+// AppModule adalah root module yang menggabungkan seluruh bagian aplikasi.
 @Module({
   imports: [
     // ConfigModule dibuat global supaya DATABASE_URL, JWT_SECRET, dan PORT

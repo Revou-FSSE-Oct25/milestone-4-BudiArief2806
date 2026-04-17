@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AccountType } from '@prisma/client';
 
+// DTO ini mendeskripsikan struktur response account yang dikirim API.
 export class AccountResponseDto {
   @ApiProperty({ example: 1 })
   id: number;
@@ -23,6 +24,7 @@ export class AccountResponseDto {
   @ApiProperty({ example: 250000 })
   balance: number;
 
+  // Timestamp memudahkan audit dan debugging perubahan data account.
   @ApiProperty()
   createdAt: Date;
 

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
+// PrismaService membungkus PrismaClient agar mudah dipakai via dependency injection NestJS.
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor(configService: ConfigService) {
@@ -10,6 +11,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     const connectionString =
       configService.get<string>('DATABASE_URL') ??
       'postgresql://postgres:postgres@localhost:5432/milstone4?schema=public';
+    // Adapter PostgreSQL diperlukan oleh Prisma 7 untuk koneksi langsung ke database.
     const adapter = new PrismaPg(connectionString);
 
     super({

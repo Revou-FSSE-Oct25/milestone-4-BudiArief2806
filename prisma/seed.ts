@@ -9,6 +9,8 @@ async function main() {
   const adminPasswordHash = await bcrypt.hash('Admin12345', 10);
   const userPasswordHash = await bcrypt.hash('User12345', 10);
 
+  // Upsert dipakai supaya seeder aman dijalankan berulang kali
+  // tanpa membuat duplikasi user admin.
   await prisma.user.upsert({
     where: { email: 'admin@banking.local' },
     update: {},
@@ -21,6 +23,7 @@ async function main() {
     },
   });
 
+  // User biasa juga dibuat dengan upsert untuk alasan yang sama.
   await prisma.user.upsert({
     where: { email: 'user@banking.local' },
     update: {},
@@ -36,9 +39,11 @@ async function main() {
 
 main()
   .then(async () => {
+    // Putus koneksi Prisma saat proses seeding selesai.
     await prisma.$disconnect();
   })
   .catch(async (error) => {
+    // Kalau ada error, tampilkan ke terminal lalu tetap tutup koneksi.
     console.error(error);
     await prisma.$disconnect();
     process.exit(1);

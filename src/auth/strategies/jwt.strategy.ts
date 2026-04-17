@@ -11,10 +11,12 @@ interface JwtPayload {
   role: UserRole;
 }
 
+// JwtStrategy menjelaskan ke Passport cara mengambil dan memvalidasi token JWT.
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
     super({
+      // Token dibaca dari header Authorization: Bearer <token>.
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey:

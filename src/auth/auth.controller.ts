@@ -14,11 +14,13 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Public } from '../common/decorators/public.decorator';
+import { UserProfileDto } from '../users/dto/user-profile.dto';
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
+// AuthController menangani endpoint publik untuk register dan login.
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -28,9 +30,11 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: 'Register a new user account' })
   @ApiBody({ type: RegisterDto })
-  @ApiCreatedResponse({ type: AuthResponseDto })
+  @ApiCreatedResponse({ type: UserProfileDto })
   @ApiBadRequestResponse({ description: 'Email already exists or request body is invalid.' })
   register(@Body() dto: RegisterDto) {
+    // Register hanya membuat user baru dan mengembalikan profile-nya.
+    // Token akan diberikan ketika user melakukan login.
     return this.authService.register(dto);
   }
 
@@ -42,6 +46,7 @@ export class AuthController {
   @ApiCreatedResponse({ type: AuthResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid email or password.' })
   login(@Body() dto: LoginDto) {
+    // Validasi field login sudah ditangani DTO dan ValidationPipe global.
     return this.authService.login(dto);
   }
 }

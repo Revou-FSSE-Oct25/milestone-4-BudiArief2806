@@ -2,6 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../common/decorators/public.decorator';
 
+// HealthController dipakai platform deploy untuk mengecek apakah service hidup.
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
