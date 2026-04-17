@@ -193,4 +193,3 @@ test/
 ## Notes
 
 - Project ini memakai Prisma 7, sehingga koneksi PostgreSQL menggunakan `@prisma/adapter-pg`.
-- Komentar `//` sudah ditambahkan di bagian alur penting agar lebih mudah dibaca saat review.
