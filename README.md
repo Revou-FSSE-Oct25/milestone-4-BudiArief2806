@@ -25,6 +25,7 @@ Untuk development lokal:
 - `DBeaver` bisa dipakai sebagai GUI client untuk melihat table, relasi, dan data <img width="1897" height="971" alt="image" src="https://github.com/user-attachments/assets/d91b8d5f-cc48-445f-8346-31fdccc49477" />
 
 -`supabase` deploy database : <img width="968" height="458" alt="image" src="https://github.com/user-attachments/assets/d804c35c-0814-4f0d-bf26-9bd91931943b" />
+- `tabel data supabase` isi deploy database : <img width="1910" height="596" alt="image" src="https://github.com/user-attachments/assets/295d2357-877b-43b4-9954-441ec0a83e34" />
 
 Jadi `DBeaver` bukan pengganti database, tetapi alat bantu untuk mengelola PostgreSQL.
 
