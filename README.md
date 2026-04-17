@@ -1,18 +1,11 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/PzCCy7VV)
 
-# Banking API Fundamental Project
+# Banking API Fundamental Arief Budi
 
 REST API perbankan sederhana menggunakan `NestJS`, `Prisma`, `PostgreSQL`, `JWT`, dan `Swagger`.
 
 Project ini memenuhi requirement fundamental berikut:
-- Prisma schema dengan model `User`, `Account`, dan `Transaction`
-- Relasi database yang jelas dan index dasar untuk performa
-- Auth JWT untuk endpoint private
-- CRUD account
-- Deposit, withdraw, dan transfer
-- DTO validation dengan `class-validator`
-- Swagger documentation
-- Unit test dan e2e test
+
 
 ## Tech Stack
 
@@ -27,8 +20,11 @@ Project ini memenuhi requirement fundamental berikut:
 ## Database Tooling
 
 Untuk development lokal:
-- `PostgreSQL` berperan sebagai database utama
-- `DBeaver` bisa dipakai sebagai GUI client untuk melihat table, relasi, dan data
+- `PostgreSQL` berperan sebagai database utama <img width="1910" height="982" alt="image" src="https://github.com/user-attachments/assets/be65daad-36c0-481d-be48-8b80b4eb0891" />
+
+- `DBeaver` bisa dipakai sebagai GUI client untuk melihat table, relasi, dan data <img width="1897" height="971" alt="image" src="https://github.com/user-attachments/assets/d91b8d5f-cc48-445f-8346-31fdccc49477" />
+
+-`supabase` deploy database : <img width="968" height="458" alt="image" src="https://github.com/user-attachments/assets/d804c35c-0814-4f0d-bf26-9bd91931943b" />
 
 Jadi `DBeaver` bukan pengganti database, tetapi alat bantu untuk mengelola PostgreSQL.
 
@@ -126,7 +122,9 @@ Swagger sudah mendokumentasikan:
 - Account tidak bisa dihapus jika saldo masih ada
 - Account tidak bisa dihapus jika sudah punya histori transaksi
 
-## Testing
+## Testing 
+<img width="854" height="508" alt="image" src="https://github.com/user-attachments/assets/f5892ff4-6361-4e86-8164-83085bc17d1c" />
+
 
 Jalankan test berikut:
 
@@ -190,6 +188,6 @@ prisma/
 test/
 ```
 
-## Notes
+## LINK RAILWAY : https://luminous-harmony-production-e4c4.up.railway.app/docs#/Auth/AuthController_login
 
 - Project ini memakai Prisma 7, sehingga koneksi PostgreSQL menggunakan `@prisma/adapter-pg`.
