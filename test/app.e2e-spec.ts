@@ -5,13 +5,17 @@ import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from './../src/prisma/prisma.service';
 
+// E2E test ini meniru alur nyata dari luar aplikasi:
+// kirim request HTTP lalu cek response yang keluar.
 describe('Banking API (e2e)', () => {
   let app;
 
   const createPrismaMock = () => {
+    // Array in-memory ini menggantikan database sungguhan selama test berjalan.
     const users: Array<{
       id: number;
       fullName: string;
+      callme: string | null;
       email: string;
       passwordHash: string;
       phone: string | null;
@@ -35,6 +39,7 @@ describe('Banking API (e2e)', () => {
     return {
       user: {
         findUnique: jest.fn(async ({ where }) => {
+          // Cari user berdasarkan email atau id sesuai kebutuhan service.
           if (where.email) {
             return users.find((user) => user.email === where.email) ?? null;
           }
@@ -46,9 +51,11 @@ describe('Banking API (e2e)', () => {
           return null;
         }),
         create: jest.fn(async ({ data }) => {
+          // Simulasikan insert user baru ke database.
           const user = {
             id: users.length + 1,
             fullName: data.fullName,
+            callme: data.callme ?? null,
             email: data.email,
             passwordHash: data.passwordHash,
             phone: data.phone ?? null,
@@ -61,6 +68,7 @@ describe('Banking API (e2e)', () => {
           return user;
         }),
         update: jest.fn(async ({ where, data }) => {
+          // Simulasikan update profile user.
           const user = users.find((item) => item.id === where.id);
 
           if (!user) {
@@ -68,6 +76,7 @@ describe('Banking API (e2e)', () => {
           }
 
           user.fullName = data.fullName ?? user.fullName;
+          user.callme = data.callme ?? user.callme;
           user.phone = data.phone ?? user.phone;
           user.updatedAt = new Date();
 
@@ -76,6 +85,7 @@ describe('Banking API (e2e)', () => {
       },
       account: {
         findUnique: jest.fn(async ({ where }) => {
+          // Mock pencarian account berdasarkan id atau nomor rekening.
           if (where.id) {
             return accounts.find((account) => account.id === where.id) ?? null;
           }
@@ -90,6 +100,7 @@ describe('Banking API (e2e)', () => {
           return null;
         }),
         create: jest.fn(async ({ data }) => {
+          // Simulasikan pembuatan rekening baru dengan saldo awal 0.
           const account = {
             id: accounts.length + 1,
             userId: data.userId,
@@ -106,6 +117,7 @@ describe('Banking API (e2e)', () => {
           return account;
         }),
         findMany: jest.fn(async ({ where }) => {
+          // Bila tidak ada filter, kembalikan semua data yang tersimpan di memori.
           if (!where || Object.keys(where).length === 0) {
             return accounts;
           }
@@ -125,6 +137,7 @@ describe('Banking API (e2e)', () => {
   };
 
   beforeEach(async () => {
+    // Buat mock Prisma baru untuk setiap test agar datanya tidak bercampur.
     const prismaMock = createPrismaMock();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -134,6 +147,7 @@ describe('Banking API (e2e)', () => {
       .useValue(prismaMock)
       .compile();
 
+    // Inisialisasi Nest app seperti saat aplikasi benar-benar berjalan.
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
       new ValidationPipe({
@@ -147,21 +161,25 @@ describe('Banking API (e2e)', () => {
   });
 
   afterEach(async () => {
+    // Tutup aplikasi agar resource test bersih.
     await app.close();
   });
 
   it('registers, logs in, and returns the authenticated profile', async () => {
+    // Skenario end-to-end utama: register lalu login lalu ambil profile.
     const registerResponse = await request(app.getHttpServer())
       .post('/auth/register')
       .send({
         fullName: 'Budi Santoso',
+        callme: 'Sanu',
         email: 'budi@example.com',
         password: 'SecurePass123',
         phone: '+628123456789',
       })
       .expect(201);
 
-    expect(registerResponse.body.user.email).toBe('budi@example.com');
+    expect(registerResponse.body.email).toBe('budi@example.com');
+    expect(registerResponse.body.accessToken).toBeUndefined();
 
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
@@ -181,6 +199,7 @@ describe('Banking API (e2e)', () => {
   });
 
   it('returns 400 when register payload is invalid', async () => {
+    // Validasi DTO harus menolak payload register yang salah.
     await request(app.getHttpServer())
       .post('/auth/register')
       .send({
@@ -192,10 +211,12 @@ describe('Banking API (e2e)', () => {
   });
 
   it('returns 401 when accessing profile without a token', async () => {
+    // Route private harus menolak request tanpa JWT.
     await request(app.getHttpServer()).get('/user/profile').expect(401);
   });
 
   it('creates an account for an authenticated user', async () => {
+    // Skenario ini memastikan auth + pembuatan account berjalan bersama-sama.
     await request(app.getHttpServer())
       .post('/auth/register')
       .send({

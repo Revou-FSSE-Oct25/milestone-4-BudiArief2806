@@ -1,3 +1,5 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/PzCCy7VV)
+
 # Banking API Fundamental Project
 
 REST API perbankan sederhana menggunakan `NestJS`, `Prisma`, `PostgreSQL`, `JWT`, dan `Swagger`.
@@ -191,4 +193,3 @@ test/
 ## Notes
 
 - Project ini memakai Prisma 7, sehingga koneksi PostgreSQL menggunakan `@prisma/adapter-pg`.
-- Komentar `//` sudah ditambahkan di bagian alur penting agar lebih mudah dibaca saat review.

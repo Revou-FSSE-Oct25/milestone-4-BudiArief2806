@@ -11,11 +11,13 @@ import { AccountResponseDto } from './dto/account-response.dto';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 
+// AccountsService berisi business logic CRUD rekening/account.
 @Injectable()
 export class AccountsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAccount(currentUser: AuthenticatedUser, dto: CreateAccountDto) {
+    // Account baru otomatis dimiliki oleh user yang sedang login.
     const account = await this.prisma.account.create({
       data: {
         userId: currentUser.sub,
@@ -30,6 +32,7 @@ export class AccountsService {
   }
 
   async findAll(currentUser: AuthenticatedUser) {
+    // User biasa hanya melihat rekening miliknya, admin bisa melihat semuanya.
     const accounts = await this.prisma.account.findMany({
       where: this.buildAccountVisibilityWhere(currentUser),
       orderBy: {
@@ -46,6 +49,7 @@ export class AccountsService {
   }
 
   async update(id: number, currentUser: AuthenticatedUser, dto: UpdateAccountDto) {
+    // Pastikan user memang berhak mengakses account yang akan diubah.
     const existingAccount = await this.findAccessibleAccountOrThrow(id, currentUser);
 
     const account = await this.prisma.account.update({
@@ -63,6 +67,7 @@ export class AccountsService {
   }
 
   async remove(id: number, currentUser: AuthenticatedUser) {
+    // Penghapusan account dibatasi oleh aturan bisnis tertentu.
     const account = await this.findAccessibleAccountOrThrow(id, currentUser);
 
     if (account.balance.toNumber() > 0) {
@@ -71,6 +76,7 @@ export class AccountsService {
       );
     }
 
+    // Account yang sudah punya histori transaksi tidak boleh dihapus agar audit trail aman.
     const transactionCount = await this.prisma.transaction.count({
       where: {
         OR: [{ sourceAccountId: account.id }, { destinationAccountId: account.id }],
@@ -93,6 +99,7 @@ export class AccountsService {
   }
 
   async findAccessibleAccountOrThrow(id: number, currentUser: AuthenticatedUser) {
+    // Query awal hanya mencari apakah account dengan ID tersebut ada.
     const account = await this.prisma.account.findUnique({
       where: { id },
     });
@@ -101,6 +108,7 @@ export class AccountsService {
       throw new NotFoundException('Account was not found.');
     }
 
+    // Admin diberi akses penuh, user biasa dibatasi ke account miliknya.
     const isAdmin = currentUser.role === UserRole.ADMIN;
 
     if (!isAdmin && account.userId !== currentUser.sub) {
@@ -111,6 +119,7 @@ export class AccountsService {
   }
 
   private buildAccountVisibilityWhere(currentUser: AuthenticatedUser) {
+    // Fungsi ini dipakai ulang untuk menyusun filter query list account.
     if (currentUser.role === UserRole.ADMIN) {
       return {};
     }
@@ -152,6 +161,7 @@ export class AccountsService {
     createdAt: Date;
     updatedAt: Date;
   }): AccountResponseDto {
+    // Decimal Prisma diubah ke number biasa agar response JSON mudah dibaca client.
     return {
       id: account.id,
       userId: account.userId,

@@ -1,35 +1,44 @@
+// Generator Prisma Client agar service NestJS bisa berinteraksi dengan database.
 generator client {
   provider = "prisma-client-js"
 }
 
+// Project ini memakai PostgreSQL sebagai relational database utama.
 datasource db {
   provider = "postgresql"
 }
 
+// Role user dipakai untuk authorization.
 enum UserRole {
   USER
   ADMIN
 }
 
+// Jenis rekening yang didukung aplikasi.
 enum AccountType {
   SAVINGS
   CHECKING
 }
 
+// Tipe transaksi utama pada banking API.
 enum TransactionType {
   DEPOSIT
   WITHDRAW
   TRANSFER
 }
 
+// Status transaksi disiapkan agar model tetap fleksibel bila nanti
+// ada skenario transaksi gagal atau pending.
 enum TransactionStatus {
   COMPLETED
   FAILED
 }
 
+// Model User menyimpan identitas login dan profile dasar pemilik rekening.
 model User {
   id                   Int           @id @default(autoincrement())
   fullName             String
+  callme               String?
   email                String        @unique
   passwordHash         String
   phone                String?
@@ -43,6 +52,7 @@ model User {
   @@index([createdAt])
 }
 
+// Model Account mewakili rekening bank milik seorang user.
 model Account {
   id                   Int           @id @default(autoincrement())
   userId               Int
@@ -62,12 +72,18 @@ model Account {
   @@index([createdAt])
 }
 
+// Model Transaction mencatat seluruh aktivitas saldo yang terjadi.
+// sourceAccountId dan destinationAccountId dibuat nullable karena:
+// - deposit hanya butuh destination
+// - withdraw hanya butuh source
+// - transfer butuh keduanya
 model Transaction {
   id                   Int               @id @default(autoincrement())
   reference            String            @unique
   transactionType      TransactionType
   status               TransactionStatus @default(COMPLETED)
   amount               Decimal           @db.Decimal(15, 2)
+  adminFee             Decimal           @default(0) @db.Decimal(15, 2)
   description          String?
   performedById        Int
   sourceAccountId      Int?

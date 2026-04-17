@@ -11,6 +11,7 @@ import { UserProfileDto } from '../users/dto/user-profile.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
+// AuthService berisi business logic untuk registrasi dan login user.
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,6 +20,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    // Cek lebih dulu apakah email sudah dipakai user lain.
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -32,17 +34,23 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
+        // Data register disimpan ke tabel User.
         fullName: dto.fullName,
+        // Nama field harus konsisten mengikuti schema Prisma, yaitu callme.
+        callme: dto.callme,
         email: dto.email,
         passwordHash,
         phone: dto.phone,
       },
     });
 
-    return this.buildAuthResponse(user);
+    // Register sekarang hanya mengembalikan profile user baru.
+    // Token akses sengaja baru diberikan saat proses login.
+    return this.toUserProfile(user);
   }
 
   async login(dto: LoginDto) {
+    // Cari user berdasarkan email yang dikirim saat login.
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -51,6 +59,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password.');
     }
 
+    // Password plain text dibandingkan dengan hash yang tersimpan di database.
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
 
     if (!isPasswordValid) {
@@ -64,17 +73,21 @@ export class AuthService {
     id: number;
     email: string;
     fullName: string;
+    // callme nullable karena field ini optional di database.
+    callme: string | null;
     phone: string | null;
     role: UserRole;
     createdAt: Date;
     updatedAt: Date;
   }) {
+    // Payload token hanya dibuat untuk endpoint login.
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
       email: user.email,
       role: user.role,
     });
 
+    // Response auth mengirim token plus ringkasan profile user.
     return {
       accessToken,
       tokenType: 'Bearer',
@@ -86,15 +99,19 @@ export class AuthService {
     id: number;
     email: string;
     fullName: string;
+    // Profile response juga harus siap menerima null.
+    callme: string | null;
     phone: string | null;
     role: UserRole;
     createdAt: Date;
     updatedAt: Date;
   }): UserProfileDto {
+    // Helper ini dipakai supaya bentuk response profile konsisten di seluruh auth/user module.
     return {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      callme: user.callme,
       phone: user.phone,
       role: user.role,
       createdAt: user.createdAt,

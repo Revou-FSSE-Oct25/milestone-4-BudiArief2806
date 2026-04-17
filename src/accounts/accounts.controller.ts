@@ -24,6 +24,7 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { AccountsService } from './accounts.service';
 
+// AccountsController menangani endpoint CRUD rekening milik user.
 @ApiTags('Accounts')
 @ApiBearerAuth('jwt-auth')
 @Controller('accounts')
@@ -37,6 +38,7 @@ export class AccountsController {
     @CurrentUser() currentUser: AuthenticatedUser,
     @Body() dto: CreateAccountDto,
   ) {
+    // currentUser memastikan account selalu dikaitkan ke user yang sedang login.
     return this.accountsService.createAccount(currentUser, dto);
   }
 
@@ -44,6 +46,7 @@ export class AccountsController {
   @ApiOperation({ summary: 'List all bank accounts visible to the authenticated user' })
   @ApiOkResponse({ type: AccountResponseDto, isArray: true })
   findAll(@CurrentUser() currentUser: AuthenticatedUser) {
+    // Endpoint ini dipakai untuk melihat daftar semua account yang boleh diakses.
     return this.accountsService.findAll(currentUser);
   }
 
@@ -55,6 +58,7 @@ export class AccountsController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() currentUser: AuthenticatedUser,
   ) {
+    // ParseIntPipe memastikan parameter :id diubah menjadi number sebelum masuk service.
     return this.accountsService.findOne(id, currentUser);
   }
 
@@ -66,6 +70,7 @@ export class AccountsController {
     @CurrentUser() currentUser: AuthenticatedUser,
     @Body() dto: UpdateAccountDto,
   ) {
+    // Request update diteruskan ke service setelah semua validasi body selesai.
     return this.accountsService.update(id, currentUser, dto);
   }
 
@@ -85,6 +90,7 @@ export class AccountsController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() currentUser: AuthenticatedUser,
   ) {
+    // Penghapusan account akan ditolak bila melanggar aturan bisnis di service.
     return this.accountsService.remove(id, currentUser);
   }
 }

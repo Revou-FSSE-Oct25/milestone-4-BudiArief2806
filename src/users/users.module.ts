@@ -3,6 +3,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
+// UsersModule berisi logika profile user yang sudah login.
 @Module({
   imports: [PrismaModule],
   controllers: [UsersController],

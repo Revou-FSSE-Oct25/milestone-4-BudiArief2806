@@ -16,6 +16,7 @@ import { TransferDto } from './dto/transfer.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import { TransactionsService } from './transactions.service';
 
+// TransactionsController menyediakan endpoint deposit, withdraw, transfer, dan histori.
 @ApiTags('Transactions')
 @ApiBearerAuth('jwt-auth')
 @Controller('transactions')
@@ -29,6 +30,7 @@ export class TransactionsController {
     @CurrentUser() currentUser: AuthenticatedUser,
     @Body() dto: DepositDto,
   ) {
+    // Deposit akan menaikkan saldo dan membuat histori transaksi baru.
     return this.transactionsService.deposit(currentUser, dto);
   }
 
@@ -40,6 +42,7 @@ export class TransactionsController {
     @CurrentUser() currentUser: AuthenticatedUser,
     @Body() dto: WithdrawDto,
   ) {
+    // Withdraw akan gagal bila saldo account tidak mencukupi.
     return this.transactionsService.withdraw(currentUser, dto);
   }
 
@@ -53,6 +56,7 @@ export class TransactionsController {
     @CurrentUser() currentUser: AuthenticatedUser,
     @Body() dto: TransferDto,
   ) {
+    // Transfer memindahkan saldo dari account sumber ke account tujuan secara atomik.
     return this.transactionsService.transfer(currentUser, dto);
   }
 
@@ -60,6 +64,7 @@ export class TransactionsController {
   @ApiOperation({ summary: 'List all transactions visible to the authenticated user' })
   @ApiOkResponse({ type: TransactionResponseDto, isArray: true })
   findAll(@CurrentUser() currentUser: AuthenticatedUser) {
+    // Endpoint list histori transaksi untuk user/admin sesuai hak aksesnya.
     return this.transactionsService.findAll(currentUser);
   }
 
@@ -71,6 +76,7 @@ export class TransactionsController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() currentUser: AuthenticatedUser,
   ) {
+    // Detail transaksi diambil berdasarkan ID setelah parameter divalidasi.
     return this.transactionsService.findOne(id, currentUser);
   }
 }

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TransactionStatus, TransactionType } from '@prisma/client';
 
+// DTO ini menjelaskan bentuk riwayat transaksi yang dikirim ke client.
 export class TransactionResponseDto {
   @ApiProperty({ example: 1 })
   id: number;
@@ -17,9 +18,14 @@ export class TransactionResponseDto {
   @ApiProperty({ example: 125000 })
   amount: number;
 
+  // adminFee dipakai terutama pada transfer agar user tahu total biaya tambahan.
+  @ApiProperty({ example: 2000 })
+  adminFee: number;
+
   @ApiProperty({ example: 'Bayar kebutuhan bulanan', nullable: true })
   description: string | null;
 
+  // performedById menunjukkan user yang memicu transaksi ini.
   @ApiProperty({ example: 1 })
   performedById: number;
 
@@ -35,6 +41,7 @@ export class TransactionResponseDto {
   @ApiProperty({ example: '109876543210', nullable: true })
   destinationAccountNumber: string | null;
 
+  // Timestamp membantu membaca urutan histori transaksi.
   @ApiProperty()
   createdAt: Date;
 
