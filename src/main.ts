@@ -48,6 +48,8 @@ async function bootstrap() {
 
   // PORT akan mengikuti environment deploy, dan fallback ke 3000 saat lokal.
   const port = configService.get<number>('PORT') ?? 3000;
-  await app.listen(port);
+  // Host 0.0.0.0 diperlukan di environment container seperti Railway
+  // agar service bisa diakses dari luar container, bukan hanya localhost internal.
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
